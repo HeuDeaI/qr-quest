@@ -1,12 +1,22 @@
 package main
 
 import (
+	"qr-quest/internal/server"
+
 	"github.com/gin-gonic/gin"
-	"qr-quest/internal/handlers"
+	"github.com/sirupsen/logrus"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
+	dsn := "host=localhost port=5432 user=postgres password=postgres dbname=qr_quest sslmode=disable"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		logrus.Fatalf("Failed to connect to database: %v", err)
+	}
 	router := gin.Default()
 
-	handlers.RegisterAdminRoutes(router)
+	server.SetupRouter(router, db)
+	router.Run("0.0.0.0:8080")
 }
