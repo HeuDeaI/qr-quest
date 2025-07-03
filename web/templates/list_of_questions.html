@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список вопросов</title>
+</head>
+<body>
+    <h1>Список всех вопросов</h1>
+    <ul>
+        {{ range .listOfQuestion }}
+            <li>
+                <strong>Вопрос:</strong> {{ .Text }}<br>
+                <strong>Ответ:</strong> {{ .Answer }}<br>
+                <a href="/admin/questions/{{ .ID }}">Посмотреть подробнее</a>
+            </li>
+            <hr>
+        {{ else }}
+            <li>Вопросы отсутствуют.</li>
+        {{ end }}
+    </ul>
+</body>
+</html>

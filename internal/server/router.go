@@ -8,11 +8,16 @@ import (
 
 	"qr-quest/internal/handlers"
 	"qr-quest/internal/middlewares"
+	"qr-quest/internal/models"
 	"qr-quest/internal/repositories"
 )
 
 func SetupRouter(router *gin.Engine, db *gorm.DB) {
 	router.LoadHTMLGlob("web/templates/*")
+	db.AutoMigrate(
+		&models.User{},
+		&models.Question{},
+	)
 
 	questionRepository := repositories.NewQuestionRepository(db)
 	adminHandler := handlers.NewAdminHandler(&questionRepository)
@@ -22,7 +27,7 @@ func SetupRouter(router *gin.Engine, db *gorm.DB) {
 
 func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler) {
 	store := cookie.NewStore([]byte("super-secret-key"))
-	router.Use(sessions.Sessions("mysession", store))
+	router.Use(sessions.Sessions("session", store))
 
 	adminGroup := router.Group("/admin")
 	{
@@ -35,7 +40,7 @@ func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler
 	questionsGroup := protectedGroup.Group("/questions")
 	{
 		questionsGroup.GET("/list", adminHandler.ShowListOfQuestions)
-		// questionsGroup.GET("/:uid", adminHandler.ShowQuestion)
+		questionsGroup.GET("/:uuid", adminHandler.ShowQuestionByID)
 		questionsGroup.POST("/create", adminHandler.HandleCreateQuestion)
 	}
 

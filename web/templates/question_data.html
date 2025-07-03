@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Детали вопроса</title>
+</head>
+<body>
+    <h1>Информация о вопросе</h1>
+    <p><strong>UUID:</strong> {{ .questionData.ID }}</p>
+    <p><strong>Текст вопроса:</strong> {{ .questionData.Text }}</p>
+    <p><strong>Ответ:</strong> {{ .questionData.Answer }}</p>
+
+    <a href="/admin/questions/list">← Назад к списку</a>
+</body>
+</html>

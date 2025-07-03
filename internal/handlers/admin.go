@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
 	"qr-quest/internal/repositories"
@@ -47,7 +48,29 @@ func (h *AdminHandler) ShowListOfQuestions(c *gin.Context) {
 	if err != nil {
 
 	}
-	c.HTML(http.StatusOK, "list_of_questions.html", listOfQuestions)
+	c.HTML(http.StatusOK, "list_of_questions.html", gin.H{
+		"listOfQuestion": listOfQuestions,
+	})
+}
+
+func (h *AdminHandler) ShowQuestionByID(c *gin.Context) {
+	uidParam := c.Param("uuid")
+
+	id, err := uuid.Parse(uidParam)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid UUID format")
+		return
+	}
+
+	questionData, err := h.questionRepository.GetQuestionByID(id)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Failed to retrieve question")
+		return
+	}
+
+	c.HTML(http.StatusOK, "question_data.html", gin.H{
+		"questionData": questionData,
+	})
 }
 
 func (h *AdminHandler) HandleCreateQuestion(c *gin.Context) {
