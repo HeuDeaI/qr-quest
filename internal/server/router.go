@@ -5,34 +5,38 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"net/http"
 
 	"qr-quest/internal/handlers"
 	"qr-quest/internal/middlewares"
 	"qr-quest/internal/models"
-	"qr-quest/internal/repositories"
 )
 
 func SetupRouter(router *gin.Engine, db *gorm.DB) {
-	router.LoadHTMLGlob("web/templates/*")
+	router.LoadHTMLGlob("templates/*")
 	db.AutoMigrate(
 		&models.User{},
 		&models.Question{},
 	)
 
-	questionRepository := repositories.NewQuestionRepository(db)
-	adminHandler := handlers.NewAdminHandler(&questionRepository)
+	adminHandler := handlers.NewAdminHandler(db)
 
 	RegisterAdminRoutes(router, adminHandler)
 }
 
 func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler) {
-	store := cookie.NewStore([]byte("super-secret-key"))
-	router.Use(sessions.Sessions("session", store))
+	store := cookie.NewStore([]byte("your-secret-key"))
+	store.Options(sessions.Options{
+		SameSite: http.SameSiteLaxMode, // Important for Safari
+	})
+	router.Use(sessions.Sessions("mysession", store))
 
 	adminGroup := router.Group("/admin")
 	{
 		adminGroup.GET("/login", adminHandler.ShowAdminLoginPage)
 		adminGroup.POST("/login", adminHandler.HandleAdminLogin)
+		adminGroup.GET("/home", adminHandler.ShowAdminHomePage)
+
 	}
 
 	protectedGroup := adminGroup.Group("/", middlewares.RequireAdminSession())
@@ -41,11 +45,15 @@ func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler
 	{
 		questionsGroup.GET("/list", adminHandler.ShowListOfQuestions)
 		questionsGroup.GET("/:id", adminHandler.ShowQuestionByID)
+		questionsGroup.GET("/create", adminHandler.ShowCreateQuestionPage)
 		questionsGroup.POST("/create", adminHandler.HandleCreateQuestion)
+		questionsGroup.POST("/:id/delete", adminHandler.HandleDeleteQuestion)
+		questionsGroup.GET("/:id/edit", adminHandler.ShowEditQuestionPage)
+		questionsGroup.POST("/:id/edit", adminHandler.HandleEditQuestion)
 	}
 
-	usersGroup := protectedGroup.Group("/users")
-	{
-		usersGroup.GET("/list", adminHandler.HandleListUsers)
-	}
+	// usersGroup := protectedGroup.Group("/users")
+	// {
+	// usersGroup.GET("/list", adminHandler.HandleListUsers)
+	// }
 }

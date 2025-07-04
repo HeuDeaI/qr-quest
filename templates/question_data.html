@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали вопроса</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-4 min-h-screen">
+    <div class="max-w-3xl mx-auto mobile-scale">
+        <div class="bg-white p-5 sm:p-7 rounded-2xl shadow-lg">
+            <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Информация о вопросе</h1>
+            <div class="space-y-5 text-lg">
+                <p><strong class="text-xl block mb-1">ID:</strong> {{ .questionData.ID }}</p>
+                <p><strong class="text-xl block mb-1">Вопрос:</strong> {{ .questionData.Text }}</p>
+                <p><strong class="text-xl block mb-1">Ответ:</strong> {{ .questionData.Answer }}</p>
+            </div>
+
+            <a href="/admin/questions/{{ .questionData.ID }}/edit" 
+                class="mt-4 inline-block w-full text-center bg-blue-100 hover:bg-blue-200 text-blue-900 px-6 py-4 rounded-xl text-lg font-medium transition">
+                ✏️ Редактировать вопрос
+            </a>
+
+            <form action="/admin/questions/{{ .questionData.ID }}/delete" method="POST" onsubmit="return confirmDeletion();" class="mt-4">
+                <button type="submit"
+                    class="w-full text-center bg-red-500 hover:bg-red-600 text-white px-6 py-4 rounded-xl text-lg font-medium transition">
+                    🗑 Удалить вопрос
+                </button>
+            </form>
+            <script>
+            function confirmDeletion() {
+                return confirm("Вы уверены, что хотите удалить этот вопрос?");
+            }
+            </script>
+            
+            <a href="/admin/questions/list" 
+                class="mt-8 inline-block w-full text-center bg-gray-100 hover:bg-gray-200 px-6 py-4 rounded-xl text-lg font-medium transition">
+                ← Назад к списку
+            </a>
+        </div>
+    </div>
+</body>
+</html>

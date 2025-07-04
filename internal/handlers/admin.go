@@ -6,22 +6,18 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-
-	"qr-quest/internal/repositories"
+	"gorm.io/gorm"
 )
 
 const hashedAdminPassword = "$2a$10$eD2aU6ZPEvcgF0//FIJl/uNvggYY5POOekaEsNxIDm61x2zxyHRzi"
 
 type AdminHandler struct {
-	questionRepository repositories.QuestionRepository
+	db *gorm.DB
 }
 
-func NewAdminHandler(questionRepository *repositories.QuestionRepository) *AdminHandler {
-	return &AdminHandler{
-		questionRepository: *questionRepository,
-	}
+func NewAdminHandler(db *gorm.DB) *AdminHandler {
+	return &AdminHandler{db: db}
 }
 
 func (h *AdminHandler) ShowAdminLoginPage(c *gin.Context) {
@@ -93,45 +89,9 @@ func (h *AdminHandler) HandleAdminLogin(c *gin.Context) {
 	session.Delete("lockedOut")
 	session.Save()
 
-	c.Redirect(http.StatusFound, "/admin/questions/list")
+	c.Redirect(http.StatusFound, "/admin/home")
 }
 
-func (h *AdminHandler) ShowListOfQuestions(c *gin.Context) {
-	listOfQuestions, err := h.questionRepository.GetListOfQuestions()
-	if err != nil {
-
-	}
-	c.HTML(http.StatusOK, "list_of_questions.html", gin.H{
-		"listOfQuestion": listOfQuestions,
-	})
-}
-
-func (h *AdminHandler) ShowQuestionByID(c *gin.Context) {
-	idParam := c.Param("id")
-
-	id, err := uuid.Parse(idParam)
-	if err != nil {
-		c.String(http.StatusBadRequest, "Invalid UUID format")
-		return
-	}
-
-	questionData, err := h.questionRepository.GetQuestionByID(id)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Failed to retrieve question")
-		return
-	}
-
-	c.HTML(http.StatusOK, "question_data.html", gin.H{
-		"questionData": questionData,
-	})
-}
-
-func (h *AdminHandler) HandleCreateQuestion(c *gin.Context) {
-	// Implement your question creation logic here
-	c.JSON(http.StatusOK, gin.H{"message": "Question created"})
-}
-
-func (h *AdminHandler) HandleListUsers(c *gin.Context) {
-	// Implement your user listing logic here
-	c.JSON(http.StatusOK, gin.H{"users": []string{"user1", "user2"}})
+func (h *AdminHandler) ShowAdminHomePage(c *gin.Context) {
+	c.HTML(http.StatusOK, "admin_home.html", nil)
 }
