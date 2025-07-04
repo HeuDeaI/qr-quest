@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/skip2/go-qrcode"
 
 	"qr-quest/internal/models"
 )
@@ -67,6 +68,25 @@ func (h *AdminHandler) HandleCreateQuestion(c *gin.Context) {
 	}
 
 	c.Redirect(http.StatusFound, "/admin/questions/"+question.ID.String())
+}
+
+func (h *AdminHandler) GenerateQRCodeDownload(c *gin.Context) {
+	id := c.Param("id")
+
+	scheme := "http"
+	if c.Request.TLS != nil {
+		scheme = "https"
+	}
+	url := scheme + "://" + c.Request.Host + "/questions/" + id
+
+	png, err := qrcode.Encode(url, qrcode.Medium, 256)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Ошибка генерации QR-кода")
+		return
+	}
+
+	c.Header("Content-Disposition", "attachment; filename=qr-question-"+id+".png")
+	c.Data(http.StatusOK, "image/png", png)
 }
 
 func (h *AdminHandler) ShowEditQuestionPage(c *gin.Context) {

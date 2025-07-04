@@ -17,6 +17,11 @@
                 <p><strong class="text-xl block mb-1">Примечание:</strong> {{ .questionData.Note }}</p>
                 {{ end }}
                 <p><strong class="text-xl block mb-1">Ответ:</strong> {{ .questionData.Answer }}</p>
+                <a href="/admin/questions/{{ .questionData.ID }}/qr"
+                    class="mt-4 inline-block w-full text-center bg-indigo-100 hover:bg-indigo-200 text-indigo-900 px-6 py-4 rounded-xl text-lg font-medium transition"
+                    download>
+                    🖨️ Скачать QR-код для печати
+                </a>
             </div>
 
             <a href="/admin/questions/{{ .questionData.ID }}/edit" 

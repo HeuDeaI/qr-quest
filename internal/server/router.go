@@ -61,6 +61,7 @@ func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler
 		questionsGroup.GET("/:id", adminHandler.ShowQuestionByID)
 		questionsGroup.GET("/create", adminHandler.ShowCreateQuestionPage)
 		questionsGroup.POST("/create", adminHandler.HandleCreateQuestion)
+		questionsGroup.GET("/:id/qr", adminHandler.GenerateQRCodeDownload)
 		questionsGroup.POST("/:id/delete", adminHandler.HandleDeleteQuestion)
 		questionsGroup.GET("/:id/edit", adminHandler.ShowEditQuestionPage)
 		questionsGroup.POST("/:id/edit", adminHandler.HandleEditQuestion)
