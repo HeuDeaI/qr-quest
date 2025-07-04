@@ -18,7 +18,7 @@
                 {{ end }}
             </div>
 
-            <form action="/quest/{{ .question.ID }}" method="POST" class="mt-6 space-y-4">
+            <form action="/questions/{{ .question.ID }}" method="POST" class="mt-6 space-y-4">
                 <label for="answer" class="block text-lg font-medium">Ваш ответ:</label>
                 <input type="text" name="answer" id="answer" required
                     class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg">
