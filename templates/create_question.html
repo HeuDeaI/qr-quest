@@ -16,6 +16,13 @@
                     <textarea id="text" name="text" rows="3" required 
                         class="w-full p-4 text-lg rounded-xl border-2 border-gray-300 focus:ring-4 focus:ring-blue-300 focus:border-blue-500"></textarea>
                 </div>
+                
+                <div>
+                    <label for="note" class="block text-lg font-medium mb-2">Примечание</label>
+                    <textarea id="note" name="note" rows="2"
+                        class="w-full p-4 text-lg rounded-xl border-2 border-gray-300 focus:ring-4 focus:ring-blue-300 focus:border-blue-500">{{ .questionData.Note }}</textarea>
+                </div>
+
                 <div>
                     <label for="answer" class="block text-lg font-medium mb-2">Ответ</label>
                     <textarea id="answer" name="answer" rows="1" required 

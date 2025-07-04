@@ -1,11 +1,12 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"net/http"
 
 	"qr-quest/internal/handlers"
 	"qr-quest/internal/middlewares"
@@ -20,16 +21,25 @@ func SetupRouter(router *gin.Engine, db *gorm.DB) {
 	)
 
 	adminHandler := handlers.NewAdminHandler(db)
+	userHandler := handlers.NewUserHandler(db)
 
-	RegisterAdminRoutes(router, adminHandler)
+	RegisterAdminRoutes(router, adminHandler, userHandler)
 }
 
-func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler) {
+func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler, userHandler *handlers.UserHandler) {
 	store := cookie.NewStore([]byte("your-secret-key"))
 	store.Options(sessions.Options{
-		SameSite: http.SameSiteLaxMode, // Important for Safari
+		MaxAge:   10 * 24 * 60 * 60,
+		SameSite: http.SameSiteLaxMode,
 	})
 	router.Use(sessions.Sessions("mysession", store))
+
+	router.GET("/login", userHandler.ShowLoginPage)
+	router.POST("/login", userHandler.HandleLogin)
+	router.GET("/about", userHandler.ShowAboutPage)
+
+	// questGroup := router.Group("/quest")
+	// protectedQuest := questGroup.Group("/", middlewares.RequireUserSession())
 
 	adminGroup := router.Group("/admin")
 	{
@@ -52,8 +62,12 @@ func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler
 		questionsGroup.POST("/:id/edit", adminHandler.HandleEditQuestion)
 	}
 
-	// usersGroup := protectedGroup.Group("/users")
-	// {
-	// usersGroup.GET("/list", adminHandler.HandleListUsers)
-	// }
+	usersGroup := protectedGroup.Group("/users")
+	{
+		usersGroup.GET("/list", adminHandler.ShowListOfUsers)
+		usersGroup.GET("/:id", adminHandler.ShowUserByID)
+		usersGroup.GET("/:id/edit", adminHandler.ShowEditUserPage)
+		usersGroup.POST("/:id/edit", adminHandler.HandleEditUser)
+		usersGroup.POST("/:id/delete", adminHandler.HandleDeleteUser)
+	}
 }

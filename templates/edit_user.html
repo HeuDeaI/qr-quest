@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактировать пользователя</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-4 min-h-screen">
+<div class="max-w-xl mx-auto mobile-scale">
+    <div class="bg-white p-5 sm:p-7 rounded-2xl shadow-lg">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Редактировать пользователя</h1>
+        <form method="POST" action="/admin/users/{{ .userData.ID }}/edit" class="space-y-6">
+            <div>
+                <label for="name" class="block text-lg font-medium mb-2">Имя пользователя</label>
+                <input id="name" name="name" type="text" required value="{{ .userData.Name }}"
+                    class="w-full p-4 text-lg rounded-xl border-2 border-gray-300 focus:ring-4 focus:ring-blue-300 focus:border-blue-500">
+            </div>
+            <div>
+                <label for="points" class="block text-lg font-medium mb-2">Очки</label>
+                <input id="points" name="points" type="text" required value="{{ .userData.Points }}"
+                    class="w-full p-4 text-lg rounded-xl border-2 border-gray-300 focus:ring-4 focus:ring-blue-300 focus:border-blue-500">
+            </div>
+            <button type="submit" 
+                class="w-full bg-blue-600 text-white px-6 py-4 rounded-xl hover:bg-blue-700 transition text-lg font-bold shadow-md">
+                💾 Сохранить изменения
+            </button>
+        </form>
+        <a href="/admin/users/list" 
+            class="mt-6 inline-block w-full text-center text-blue-600 hover:text-blue-800 text-lg font-medium py-3">
+            ← Назад к списку
+        </a>
+    </div>
+</div>
+</body>
+</html>

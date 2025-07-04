@@ -46,6 +46,7 @@ func (h *AdminHandler) HandleCreateQuestion(c *gin.Context) {
 	var input struct {
 		Text   string `form:"text" binding:"required"`
 		Answer string `form:"answer" binding:"required"`
+		Note   string `form:"note"`
 	}
 
 	if err := c.ShouldBind(&input); err != nil {
@@ -57,6 +58,7 @@ func (h *AdminHandler) HandleCreateQuestion(c *gin.Context) {
 		ID:     uuid.New(),
 		Text:   input.Text,
 		Answer: input.Answer,
+		Note:   input.Note,
 	}
 
 	if err := h.db.Create(&question).Error; err != nil {
@@ -95,6 +97,7 @@ func (h *AdminHandler) HandleEditQuestion(c *gin.Context) {
 	var input struct {
 		Text   string `form:"text" binding:"required"`
 		Answer string `form:"answer" binding:"required"`
+		Note   string `form:"note"`
 	}
 
 	if err := c.ShouldBind(&input); err != nil {
@@ -104,7 +107,7 @@ func (h *AdminHandler) HandleEditQuestion(c *gin.Context) {
 
 	if err := h.db.Model(&models.Question{}).
 		Where("id = ?", id).
-		Updates(models.Question{Text: input.Text, Answer: input.Answer}).Error; err != nil {
+		Updates(models.Question{Text: input.Text, Answer: input.Answer, Note: input.Note}).Error; err != nil {
 		c.String(http.StatusInternalServerError, "Ошибка при обновлении вопроса: %v", err)
 		return
 	}

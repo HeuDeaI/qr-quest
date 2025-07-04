@@ -11,7 +11,7 @@ func RequireUserSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		if _, ok := session.Get("Username").(string); !ok {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+			c.Redirect(http.StatusFound, "/login")
 			c.Abort()
 			return
 		}

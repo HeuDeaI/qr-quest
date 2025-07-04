@@ -13,6 +13,9 @@
             <div class="space-y-5 text-lg">
                 <p><strong class="text-xl block mb-1">ID:</strong> {{ .questionData.ID }}</p>
                 <p><strong class="text-xl block mb-1">Вопрос:</strong> {{ .questionData.Text }}</p>
+                {{ if .questionData.Note }}
+                <p><strong class="text-xl block mb-1">Примечание:</strong> {{ .questionData.Note }}</p>
+                {{ end }}
                 <p><strong class="text-xl block mb-1">Ответ:</strong> {{ .questionData.Answer }}</p>
             </div>
 
@@ -32,7 +35,7 @@
                 return confirm("Вы уверены, что хотите удалить этот вопрос?");
             }
             </script>
-            
+
             <a href="/admin/questions/list" 
                 class="mt-8 inline-block w-full text-center bg-gray-100 hover:bg-gray-200 px-6 py-4 rounded-xl text-lg font-medium transition">
                 ← Назад к списку

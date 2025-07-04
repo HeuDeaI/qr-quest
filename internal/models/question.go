@@ -8,4 +8,5 @@ type Question struct {
 	ID     uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
 	Text   string
 	Answer string
+	Note   string
 }
