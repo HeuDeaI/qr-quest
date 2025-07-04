@@ -1,15 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Для администратора</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <form method="POST" action="/admin/login">
-        <h2>Вход</h2>
-        <p>Введите пароль:</p>
-        <input type="password" name="password">
-        <br><br>
-        <button type="submit">Войти</button>
-    </form>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen px-4">
+    <div class="bg-white p-6 rounded shadow-md w-full max-w-sm">
+        <h2 class="text-2xl font-bold mb-4 text-center">Вход администратора</h2>
+
+        {{ if .error }}
+            <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 text-center">
+                {{ .error }}
+            </div>
+        {{ end }}
+
+        {{ if not .lockedOut }}
+            <form 
+                method="POST" 
+                action="/admin/login" 
+                class="flex flex-col gap-4"
+            >
+                <label class="block text-sm font-medium text-gray-700">
+                    Пароль:
+                    <input 
+                        type="password" 
+                        name="password" 
+                        autofocus
+                        class="mt-1 block w-full border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                        required
+                    >
+                </label>
+                <button 
+                    type="submit" 
+                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+                >
+                    Войти
+                </button>
+            </form>
+        {{ end }}
+    </div>
 </body>
 </html>

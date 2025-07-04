@@ -40,7 +40,7 @@ func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler
 	questionsGroup := protectedGroup.Group("/questions")
 	{
 		questionsGroup.GET("/list", adminHandler.ShowListOfQuestions)
-		questionsGroup.GET("/:uuid", adminHandler.ShowQuestionByID)
+		questionsGroup.GET("/:id", adminHandler.ShowQuestionByID)
 		questionsGroup.POST("/create", adminHandler.HandleCreateQuestion)
 	}
 
