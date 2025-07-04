@@ -29,6 +29,7 @@ func SetupRouter(router *gin.Engine, db *gorm.DB) {
 func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler, userHandler *handlers.UserHandler) {
 	store := cookie.NewStore([]byte("your-secret-key"))
 	store.Options(sessions.Options{
+		Path:     "/",
 		MaxAge:   10 * 24 * 60 * 60,
 		SameSite: http.SameSiteLaxMode,
 	})
@@ -38,8 +39,11 @@ func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler
 	router.POST("/login", userHandler.HandleLogin)
 	router.GET("/about", userHandler.ShowAboutPage)
 
-	// questGroup := router.Group("/quest")
-	// protectedQuest := questGroup.Group("/", middlewares.RequireUserSession())
+	questGroup := router.Group("/questions", middlewares.RequireUserSession())
+	{
+		questGroup.GET("/:id", userHandler.ShowQuestion)
+		questGroup.POST("/:id", userHandler.SubmitAnswer)
+	}
 
 	adminGroup := router.Group("/admin")
 	{

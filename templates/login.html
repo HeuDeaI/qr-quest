@@ -10,23 +10,27 @@
     <div class="max-w-xl mx-auto mobile-scale">
         <div class="bg-white p-5 sm:p-7 rounded-2xl shadow-lg">
             <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Добро пожаловать!</h1>
-            <p class="text-lg text-center mb-6">Введите имя, чтобы начать участие в викторине</p>
+            {{ if not .exist }}
+                <p class="text-lg text-center mb-6">Введите имя, чтобы начать участие в викторине</p>
+            {{ end}}
 
             {{ if .error }}
-            <p class="text-red-600 text-lg text-center mb-4">{{ .error }}</p>
+                <p class="text-red-600 text-lg text-center mb-4">{{ .error }}</p>
             {{ end }}
 
-            <form method="POST" action="/login" class="space-y-6">
-                <div>
-                    <label for="username" class="block text-lg font-medium mb-2">Имя пользователя</label>
-                    <input id="username" name="username" type="text" required
-                        class="w-full p-4 text-lg rounded-xl border-2 border-gray-300 focus:ring-4 focus:ring-blue-300 focus:border-blue-500">
-                </div>
-                <button type="submit"
-                    class="w-full bg-blue-600 text-white px-6 py-4 rounded-xl hover:bg-blue-700 transition text-lg font-bold shadow-md">
-                🚀 Начать
-                </button>
-            </form>
+            {{ if not .exist }}
+                <form method="POST" action="/login" class="space-y-6">
+                    <div>
+                        <label for="username" class="block text-lg font-medium mb-2">Имя пользователя</label>
+                        <input id="username" name="username" type="text" required
+                            class="w-full p-4 text-lg rounded-xl border-2 border-gray-300 focus:ring-4 focus:ring-blue-300 focus:border-blue-500">
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white px-6 py-4 rounded-xl hover:bg-blue-700 transition text-lg font-bold shadow-md">
+                    🚀 Начать
+                    </button>
+                </form>
+            {{ end }}
         </div>
     </div>
 </body>

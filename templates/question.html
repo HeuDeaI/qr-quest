@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вопрос</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-4 min-h-screen">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+            <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center">🧠 Вопрос</h1>
+
+            <div class="space-y-4 text-lg">
+                <p><strong class="text-xl block mb-1">Вопрос:</strong> {{ .question.Text }}</p>
+                {{ if .question.Note }}
+                <p><strong class="text-xl block mb-1">Примечание:</strong> {{ .question.Note }}</p>
+                {{ end }}
+            </div>
+
+            <form action="/quest/{{ .question.ID }}" method="POST" class="mt-6 space-y-4">
+                <label for="answer" class="block text-lg font-medium">Ваш ответ:</label>
+                <input type="text" name="answer" id="answer" required
+                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg">
+
+                <button type="submit"
+                    class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl text-lg font-medium transition">
+                    ✅ Проверить ответ
+                </button>
+            </form>
+
+            <a href="/about" 
+                class="mt-8 inline-block w-full text-center bg-gray-100 hover:bg-gray-200 px-6 py-4 rounded-xl text-lg font-medium transition">
+                ← Назад
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -22,6 +22,16 @@ func (h *UserHandler) ShowLoginPage(c *gin.Context) {
 }
 
 func (h *UserHandler) HandleLogin(c *gin.Context) {
+	session := sessions.Default(c)
+
+	if session.Get("username") != nil {
+		c.HTML(http.StatusBadRequest, "login.html", gin.H{
+			"error": "Вы уже являетесь участником.",
+			"exist": true,
+		})
+		return
+	}
+
 	username := c.PostForm("username")
 	if username == "" {
 		c.HTML(http.StatusBadRequest, "login.html", gin.H{
@@ -51,15 +61,18 @@ func (h *UserHandler) HandleLogin(c *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(c)
-	session.Set("Username", newUser.Name)
+	session.Set("username", newUser.Name)
+	redirectPath, ok := session.Get("redirectTo").(string)
+	session.Delete("redirectTo")
 	session.Save()
 
-	c.Redirect(http.StatusFound, "/about")
+	if ok && redirectPath != "" {
+		c.Redirect(http.StatusFound, redirectPath)
+	} else {
+		c.Redirect(http.StatusFound, "/about")
+	}
 }
 
 func (h *UserHandler) ShowAboutPage(c *gin.Context) {
-	session := sessions.Default(c)
-	username := session.Get("Username")
-	c.HTML(http.StatusOK, "about.html", gin.H{"Username": username})
+	c.HTML(http.StatusOK, "about.html", gin.H{})
 }
