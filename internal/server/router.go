@@ -18,6 +18,7 @@ func SetupRouter(router *gin.Engine, db *gorm.DB) {
 	db.AutoMigrate(
 		&models.User{},
 		&models.Question{},
+		&models.UserQuestionAttempt{},
 	)
 
 	adminHandler := handlers.NewAdminHandler(db)
@@ -49,11 +50,11 @@ func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler
 	{
 		adminGroup.GET("/login", adminHandler.ShowAdminLoginPage)
 		adminGroup.POST("/login", adminHandler.HandleAdminLogin)
-		adminGroup.GET("/home", adminHandler.ShowAdminHomePage)
-
 	}
 
 	protectedGroup := adminGroup.Group("/", middlewares.RequireAdminSession())
+
+	protectedGroup.GET("/home", adminHandler.ShowAdminHomePage)
 
 	questionsGroup := protectedGroup.Group("/questions")
 	{

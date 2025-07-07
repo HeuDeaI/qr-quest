@@ -18,7 +18,7 @@
             </div>
             <div>
                 <label for="points" class="block text-lg font-medium mb-2">Очки</label>
-                <input id="points" name="points" type="text" required value="{{ .userData.Points }}"
+                <input id="points" name="points" type="number" required min="0" value="{{ .userData.Points }}"
                     class="w-full p-4 text-lg rounded-xl border-2 border-gray-300 focus:ring-4 focus:ring-blue-300 focus:border-blue-500">
             </div>
             <button type="submit" 

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -48,18 +49,20 @@ func (h *AdminHandler) HandleCreateQuestion(c *gin.Context) {
 		Text   string `form:"text" binding:"required"`
 		Answer string `form:"answer" binding:"required"`
 		Note   string `form:"note"`
+		Points int    `form:"points" binding:"required"`
 	}
 
 	if err := c.ShouldBind(&input); err != nil {
 		c.String(http.StatusBadRequest, "Ошибка валидации: %v", err)
 		return
 	}
-
 	question := models.Question{
-		ID:     uuid.New(),
-		Text:   input.Text,
-		Answer: input.Answer,
-		Note:   input.Note,
+		ID:        uuid.New(),
+		Text:      input.Text,
+		Answer:    input.Answer,
+		Note:      input.Note,
+		Points:    input.Points,
+		CreatedAt: time.Now().Unix(),
 	}
 
 	if err := h.db.Create(&question).Error; err != nil {
@@ -118,6 +121,7 @@ func (h *AdminHandler) HandleEditQuestion(c *gin.Context) {
 		Text   string `form:"text" binding:"required"`
 		Answer string `form:"answer" binding:"required"`
 		Note   string `form:"note"`
+		Points int    `form:"points" binding:"required"`
 	}
 
 	if err := c.ShouldBind(&input); err != nil {
@@ -127,7 +131,7 @@ func (h *AdminHandler) HandleEditQuestion(c *gin.Context) {
 
 	if err := h.db.Model(&models.Question{}).
 		Where("id = ?", id).
-		Updates(models.Question{Text: input.Text, Answer: input.Answer, Note: input.Note}).Error; err != nil {
+		Updates(models.Question{Text: input.Text, Answer: input.Answer, Note: input.Note, Points: input.Points}).Error; err != nil {
 		c.String(http.StatusInternalServerError, "Ошибка при обновлении вопроса: %v", err)
 		return
 	}

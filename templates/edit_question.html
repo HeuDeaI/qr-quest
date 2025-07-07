@@ -28,6 +28,13 @@
                     <textarea id="answer" name="answer" rows="1" required 
                         class="w-full p-4 text-lg rounded-xl border-2 border-gray-300 focus:ring-4 focus:ring-blue-300 focus:border-blue-500">{{ .questionData.Answer }}</textarea>
                 </div>
+
+                <div>
+                    <label for="points" class="block text-lg font-medium mb-2">Баллы за правильный ответ</label>
+                    <input type="number" id="points" name="points" min="1" value="{{ .questionData.Points }}" required
+                        class="w-full p-4 text-lg rounded-xl border-2 border-gray-300 focus:ring-4 focus:ring-blue-300 focus:border-blue-500">
+                </div>
+                
                 <button type="submit" 
                     class="w-full bg-blue-600 text-white px-6 py-4 rounded-xl hover:bg-blue-700 transition text-lg font-bold shadow-md">
                     💾 Сохранить изменения

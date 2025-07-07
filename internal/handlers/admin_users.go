@@ -64,7 +64,7 @@ func (h *AdminHandler) HandleEditUser(c *gin.Context) {
 
 	if err := h.db.Model(&models.User{}).
 		Where("id = ?", id).
-		Updates(models.User{Name: input.Name, Points: uint(pointsUint)}).Error; err != nil {
+		Updates(models.User{Name: input.Name, Points: int(pointsUint)}).Error; err != nil {
 		c.String(http.StatusInternalServerError, "Ошибка при обновлении пользователя: %v", err)
 		return
 	}
