@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"bytes"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/phpdave11/gofpdf"
 	"github.com/skip2/go-qrcode"
 
 	"qr-quest/internal/models"
@@ -73,7 +75,7 @@ func (h *AdminHandler) HandleCreateQuestion(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/admin/questions/"+question.ID.String())
 }
 
-func (h *AdminHandler) GenerateQRCodeDownload(c *gin.Context) {
+func (h *AdminHandler) GenerateQRCodePDF(c *gin.Context) {
 	id := c.Param("id")
 
 	scheme := "http"
@@ -82,14 +84,41 @@ func (h *AdminHandler) GenerateQRCodeDownload(c *gin.Context) {
 	}
 	url := scheme + "://" + c.Request.Host + "/questions/" + id
 
-	png, err := qrcode.Encode(url, qrcode.Medium, 256)
+	qrPNG, err := qrcode.Encode(url, qrcode.Medium, 256)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Ошибка генерации QR-кода")
 		return
 	}
 
-	c.Header("Content-Disposition", "attachment; filename=qr-question-"+id+".png")
-	c.Data(http.StatusOK, "image/png", png)
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddUTF8Font("ComicSansMS", "", "internal/handlers/ComicSansMS.ttf")
+	pdf.SetFont("ComicSansMS", "", 72)
+	pdf.AddPage()
+	text := "QR-Квест!"
+	width, _ := pdf.GetPageSize()
+	textWidth := pdf.GetStringWidth(text)
+	pdf.SetXY((width-textWidth)/2, 20)
+	pdf.CellFormat(textWidth, 10, text, "", 0, "C", false, 0, "")
+
+	imgOpts := gofpdf.ImageOptions{ImageType: "PNG", ReadDpi: false}
+	pdf.RegisterImageOptionsReader("qr.png", imgOpts, bytes.NewReader(qrPNG))
+
+	pdf.ImageOptions("qr.png", 15, 40, 180, 180, false, imgOpts, 0, "")
+
+	pdf.SetFont("ComicSansMS", "", 48)
+	pdf.SetXY(15, 230)
+	pdf.MultiCell(180, 20, "Сканируй и отвечай на вопросы!", "", "C", false)
+
+	var buf bytes.Buffer
+	err = pdf.Output(&buf)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Ошибка генерации PDF-файла")
+		return
+	}
+
+	c.Header("Content-Type", "application/pdf")
+	c.Header("Content-Disposition", "attachment; filename=qr-question-"+id+".pdf")
+	c.Data(http.StatusOK, "application/pdf", buf.Bytes())
 }
 
 func (h *AdminHandler) ShowEditQuestionPage(c *gin.Context) {
