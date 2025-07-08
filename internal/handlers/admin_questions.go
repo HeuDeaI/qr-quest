@@ -82,9 +82,10 @@ func (h *AdminHandler) GenerateQRCodePDF(c *gin.Context) {
 	if c.Request.TLS != nil {
 		scheme = "https"
 	}
-	url := scheme + "://" + c.Request.Host + "/questions/" + id
+	// url := scheme + "://" + c.Request.Host + "/questions/" + id
+	url := scheme + "://172.20.10.8:8080/questions/" + id
 
-	qrPNG, err := qrcode.Encode(url, qrcode.Medium, 256)
+	qrPNG, err := qrcode.Encode(url, qrcode.High, 2048)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Ошибка генерации QR-кода")
 		return
@@ -100,7 +101,7 @@ func (h *AdminHandler) GenerateQRCodePDF(c *gin.Context) {
 	pdf.SetXY((width-textWidth)/2, 20)
 	pdf.CellFormat(textWidth, 10, text, "", 0, "C", false, 0, "")
 
-	imgOpts := gofpdf.ImageOptions{ImageType: "PNG", ReadDpi: false}
+	imgOpts := gofpdf.ImageOptions{ImageType: "PNG", ReadDpi: true}
 	pdf.RegisterImageOptionsReader("qr.png", imgOpts, bytes.NewReader(qrPNG))
 
 	pdf.ImageOptions("qr.png", 15, 40, 180, 180, false, imgOpts, 0, "")

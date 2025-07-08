@@ -1,6 +1,7 @@
 package server
 
 import (
+	"html/template"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -14,6 +15,13 @@ import (
 )
 
 func SetupRouter(router *gin.Engine, db *gorm.DB) {
+	funcMap := template.FuncMap{
+		"add": func(i, j int) int {
+			return i + j
+		},
+	}
+
+	router.SetFuncMap(funcMap)
 	router.LoadHTMLGlob("templates/*")
 	db.AutoMigrate(
 		&models.User{},
@@ -39,6 +47,7 @@ func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler
 	router.GET("/login", userHandler.ShowLoginPage)
 	router.POST("/login", userHandler.HandleLogin)
 	router.GET("/about", userHandler.ShowAboutPage)
+	router.GET("/leaderboard", userHandler.ShowLeaderBoard)
 
 	questGroup := router.Group("/questions", middlewares.RequireUserSession())
 	{

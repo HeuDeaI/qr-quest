@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рейтинг участников</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .user-highlight {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid rgb(59, 130, 246);
+        }
+        .rank-1 {
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+        .rank-2 {
+            background-color: rgba(192, 192, 192, 0.1);
+        }
+        .rank-3 {
+            background-color: rgba(205, 127, 50, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-4 min-h-screen">
+    <div class="max-w-2xl mx-auto mobile-scale">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center">🏆 Рейтинг участников</h1>
+            
+            <div class="mb-4 text-center text-gray-600">
+                <p>Текущий топ игроков нашего квиза</p>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-lg">
+                    <thead>
+                        <tr class="border-b-2 border-gray-200">
+                            <th class="text-left pb-3 px-2">#</th>
+                            <th class="text-left pb-3 px-2">Участник</th>
+                            <th class="text-right pb-3 px-2">Баллы</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ range $index, $user := .AllUsers }}
+                        <tr class="border-b border-gray-100 hover:bg-gray-50 transition
+                            {{ if eq $user.Name $.User }}user-highlight{{ end }}
+                            {{ if eq $index 0 }}rank-1{{ else if eq $index 1 }}rank-2{{ else if eq $index 2 }}rank-3{{ end }}">
+                            <td class="py-4 px-2 font-medium">
+                                {{ add $index 1 }}
+                                {{ if eq $index 0 }}<span class="text-yellow-500">🥇</span>
+                                {{ else if eq $index 1 }}<span class="text-gray-400">🥈</span>
+                                {{ else if eq $index 2 }}<span class="text-amber-700">🥉</span>{{ end }}
+                            </td>
+                            <td class="py-4 px-2">
+                                {{ $user.Name }}
+                                {{ if eq $user.Name $.User }}<span class="text-blue-500 ml-2">(это вы!)</span>{{ end }}
+                            </td>
+                            <td class="py-4 px-2 text-right font-bold">{{ $user.Points }}</td>
+                        </tr>
+                        {{ end }}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-6 text-center text-sm text-gray-500">
+                <p>Рейтинг обновляется в реальном времени. Ваше место зависит от количества правильных ответов и скорости!</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

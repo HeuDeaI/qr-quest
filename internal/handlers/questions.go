@@ -5,6 +5,7 @@ import (
 	"math"
 	"net/http"
 	"qr-quest/internal/models"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/sessions"
@@ -57,7 +58,7 @@ func (h *UserHandler) SubmitAnswer(c *gin.Context) {
 		return
 	}
 
-	isCorrect := question.Answer == userAnswer
+	isCorrect := h.normalizeAnswer(question.Answer) == h.normalizeAnswer(userAnswer)
 
 	var attempt models.UserQuestionAttempt
 	err = h.db.
@@ -96,7 +97,6 @@ func (h *UserHandler) SubmitAnswer(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "result.html", gin.H{
 		"Correct":      isCorrect,
-		"Question":     question,
 		"Answer":       userAnswer,
 		"Points":       user.Points,
 		"EarnedPoints": earnedPoints,
@@ -134,4 +134,8 @@ func (h *UserHandler) getCurrentUser(c *gin.Context) (*models.User, error) {
 	}
 
 	return &user, nil
+}
+
+func (h *UserHandler) normalizeAnswer(s string) string {
+	return strings.TrimSpace(strings.ToLower(s))
 }
