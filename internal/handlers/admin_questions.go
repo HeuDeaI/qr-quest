@@ -82,8 +82,7 @@ func (h *AdminHandler) GenerateQRCodePDF(c *gin.Context) {
 	if c.Request.TLS != nil {
 		scheme = "https"
 	}
-	// url := scheme + "://" + c.Request.Host + "/questions/" + id
-	url := scheme + "://172.20.10.8:8080/questions/" + id
+	url := scheme + "://" + c.Request.Host + "/questions/" + id
 
 	qrPNG, err := qrcode.Encode(url, qrcode.High, 2048)
 	if err != nil {
@@ -92,7 +91,7 @@ func (h *AdminHandler) GenerateQRCodePDF(c *gin.Context) {
 	}
 
 	pdf := gofpdf.New("P", "mm", "A4", "")
-	pdf.AddUTF8Font("ComicSansMS", "", "internal/handlers/ComicSansMS.ttf")
+	pdf.AddUTF8Font("ComicSansMS", "", "fonts/ComicSansMS.ttf")
 	pdf.SetFont("ComicSansMS", "", 72)
 	pdf.AddPage()
 	text := "QR-Квест!"

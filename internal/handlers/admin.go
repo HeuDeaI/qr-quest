@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const hashedAdminPassword = "$2a$10$eD2aU6ZPEvcgF0//FIJl/uNvggYY5POOekaEsNxIDm61x2zxyHRzi"
+const hashedAdminPassword = "$2a$10$hJNTP1RBLtUAZzkrTKKL4uxg2crobGP8dOge4k940GEAhLvS4quEC"
 
 type AdminHandler struct {
 	db *gorm.DB

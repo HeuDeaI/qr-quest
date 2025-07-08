@@ -22,6 +22,7 @@ func SetupRouter(router *gin.Engine, db *gorm.DB) {
 	}
 
 	router.SetFuncMap(funcMap)
+	router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/*")
 	db.AutoMigrate(
 		&models.User{},
@@ -43,6 +44,10 @@ func RegisterAdminRoutes(router *gin.Engine, adminHandler *handlers.AdminHandler
 		SameSite: http.SameSiteLaxMode,
 	})
 	router.Use(sessions.Sessions("mysession", store))
+
+	router.GET("/favicon.ico", func(c *gin.Context) {
+		c.File("static/favicon.ico")
+	})
 
 	router.GET("/login", userHandler.ShowLoginPage)
 	router.POST("/login", userHandler.HandleLogin)
