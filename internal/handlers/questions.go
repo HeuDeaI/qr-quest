@@ -96,6 +96,7 @@ func (h *UserHandler) SubmitAnswer(c *gin.Context) {
 	h.db.Save(&user)
 
 	c.HTML(http.StatusOK, "result.html", gin.H{
+		"ID":           question.ID,
 		"Correct":      isCorrect,
 		"Answer":       userAnswer,
 		"Points":       user.Points,
