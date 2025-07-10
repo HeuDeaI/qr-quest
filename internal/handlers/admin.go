@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/minio/minio-go/v7"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -13,11 +14,15 @@ import (
 const hashedAdminPassword = "$2a$10$hJNTP1RBLtUAZzkrTKKL4uxg2crobGP8dOge4k940GEAhLvS4quEC"
 
 type AdminHandler struct {
-	db *gorm.DB
+	db    *gorm.DB
+	minio *minio.Client
 }
 
-func NewAdminHandler(db *gorm.DB) *AdminHandler {
-	return &AdminHandler{db: db}
+func NewAdminHandler(db *gorm.DB, minio *minio.Client) *AdminHandler {
+	return &AdminHandler{
+		db:    db,
+		minio: minio,
+	}
 }
 
 func (h *AdminHandler) ShowAdminLoginPage(c *gin.Context) {

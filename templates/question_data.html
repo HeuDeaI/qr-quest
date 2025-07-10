@@ -14,9 +14,19 @@
             <div class="space-y-5 text-lg">
                 <p><strong class="text-xl block mb-1">ID:</strong> {{ .questionData.ID }}</p>
                 <p><strong class="text-xl block mb-1">Вопрос:</strong> {{ .questionData.Text }}</p>
+
+                {{ if .questionData.ImageURL }}
+                <p>
+                    <strong class="text-xl block mb-1">Изображение:</strong>
+                    <img src="{{ .questionData.ImageURL }}" alt="Изображение вопроса" 
+                        class="rounded-xl w-full max-w-lg border border-gray-200 mt-2">
+                </p>
+                {{ end }}
+
                 {{ if .questionData.Note }}
                 <p><strong class="text-xl block mb-1">Примечание:</strong> {{ .questionData.Note }}</p>
                 {{ end }}
+
                 <p><strong class="text-xl block mb-1">Ответ:</strong> {{ .questionData.Answer }}</p>
                 <p><strong class="text-xl block mb-1">Баллы за ответ:</strong> {{ .questionData.Points }}</p>
                 <a href="/admin/questions/{{ .questionData.ID }}/qr"

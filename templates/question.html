@@ -14,6 +14,15 @@
 
             <div class="space-y-4 text-lg">
                 <p><strong class="text-xl block mb-1">Вопрос:</strong> {{ .question.Text }}</p>
+
+                {{ if .question.ImageURL }}
+                <p>
+                    <strong class="text-xl block mb-1">Изображение:</strong>
+                    <img src="{{ .question.ImageURL }}" alt="Изображение вопроса" 
+                        class="rounded-xl w-full max-w-lg border border-gray-200 mt-2">
+                </p>
+                {{ end }}
+
                 {{ if .question.Note }}
                 <p><strong class="text-xl block mb-1">Примечание:</strong> {{ .question.Note }}</p>
                 {{ end }}

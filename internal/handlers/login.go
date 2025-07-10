@@ -6,15 +6,20 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/minio/minio-go/v7"
 	"gorm.io/gorm"
 )
 
 type UserHandler struct {
-	db *gorm.DB
+	db    *gorm.DB
+	minio *minio.Client
 }
 
-func NewUserHandler(db *gorm.DB) *UserHandler {
-	return &UserHandler{db: db}
+func NewUserHandler(db *gorm.DB, minio *minio.Client) *UserHandler {
+	return &UserHandler{
+		db:    db,
+		minio: minio,
+	}
 }
 
 func (h *UserHandler) ShowLoginPage(c *gin.Context) {

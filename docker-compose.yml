@@ -9,6 +9,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      minio:
+        condition: service_started
     networks:
       - app
 
@@ -32,8 +34,21 @@ services:
     networks:
       - app
 
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - app
+
 volumes:
   pgdata:
+  minio-data:
 
 networks:
   app:

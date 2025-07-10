@@ -3,10 +3,12 @@ package server
 import (
 	"html/template"
 	"net/http"
+	"strings"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"github.com/minio/minio-go/v7"
 	"gorm.io/gorm"
 
 	"qr-quest/internal/handlers"
@@ -14,7 +16,7 @@ import (
 	"qr-quest/internal/models"
 )
 
-func SetupRouter(router *gin.Engine, db *gorm.DB) {
+func SetupRouter(router *gin.Engine, db *gorm.DB, minioClient *minio.Client) {
 	funcMap := template.FuncMap{
 		"add": func(i, j int) int {
 			return i + j
@@ -24,14 +26,35 @@ func SetupRouter(router *gin.Engine, db *gorm.DB) {
 	router.SetFuncMap(funcMap)
 	router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/*")
+
+	router.GET("/minio/:bucket/*object", func(c *gin.Context) {
+		bucket := c.Param("bucket")
+		object := strings.TrimPrefix(c.Param("object"), "/")
+
+		obj, err := minioClient.GetObject(c, bucket, object, minio.GetObjectOptions{})
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Ошибка получения объекта из MinIO")
+			return
+		}
+		defer obj.Close()
+
+		stat, err := obj.Stat()
+		if err != nil {
+			c.String(http.StatusNotFound, "Файл не найден")
+			return
+		}
+
+		c.DataFromReader(http.StatusOK, stat.Size, stat.ContentType, obj, nil)
+	})
+
 	db.AutoMigrate(
 		&models.User{},
 		&models.Question{},
 		&models.UserQuestionAttempt{},
 	)
 
-	adminHandler := handlers.NewAdminHandler(db)
-	userHandler := handlers.NewUserHandler(db)
+	adminHandler := handlers.NewAdminHandler(db, minioClient)
+	userHandler := handlers.NewUserHandler(db, minioClient)
 
 	RegisterAdminRoutes(router, adminHandler, userHandler)
 }

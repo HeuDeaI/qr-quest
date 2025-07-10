@@ -9,6 +9,7 @@ type Question struct {
 	Text      string
 	Answer    string
 	Note      string
+	ImageURL  string
 	Points    int
 	CreatedAt int64
 }

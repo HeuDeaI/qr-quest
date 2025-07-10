@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/minio/minio-go/v7"
 	"github.com/phpdave11/gofpdf"
 	"github.com/skip2/go-qrcode"
 
@@ -58,12 +59,36 @@ func (h *AdminHandler) HandleCreateQuestion(c *gin.Context) {
 		c.String(http.StatusBadRequest, "Ошибка валидации: %v", err)
 		return
 	}
+
+	file, err := c.FormFile("image")
+	var imageURL string
+	if err == nil {
+		src, err := file.Open()
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Ошибка открытия файла")
+			return
+		}
+		defer src.Close()
+
+		objectName := "questions/" + uuid.New().String() + "-" + file.Filename
+		_, err = h.minio.PutObject(c, "qrquest-images", objectName, src, file.Size, minio.PutObjectOptions{
+			ContentType: file.Header.Get("Content-Type"),
+		})
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Ошибка загрузки изображения")
+			return
+		}
+
+		imageURL = "/minio/qrquest-images/" + objectName
+	}
+
 	question := models.Question{
 		ID:        uuid.New(),
 		Text:      input.Text,
 		Answer:    input.Answer,
 		Note:      input.Note,
 		Points:    input.Points,
+		ImageURL:  imageURL,
 		CreatedAt: time.Now().Unix(),
 	}
 
@@ -146,6 +171,12 @@ func (h *AdminHandler) HandleEditQuestion(c *gin.Context) {
 		return
 	}
 
+	var question models.Question
+	if err := h.db.First(&question, "id = ?", id).Error; err != nil {
+		c.String(http.StatusInternalServerError, "Не удалось получить вопрос")
+		return
+	}
+
 	var input struct {
 		Text   string `form:"text" binding:"required"`
 		Answer string `form:"answer" binding:"required"`
@@ -158,9 +189,37 @@ func (h *AdminHandler) HandleEditQuestion(c *gin.Context) {
 		return
 	}
 
-	if err := h.db.Model(&models.Question{}).
-		Where("id = ?", id).
-		Updates(models.Question{Text: input.Text, Answer: input.Answer, Note: input.Note, Points: input.Points}).Error; err != nil {
+	file, err := c.FormFile("image")
+	if err == nil {
+		src, err := file.Open()
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Ошибка открытия файла")
+			return
+		}
+		defer src.Close()
+
+		if question.ImageURL != "" {
+			objectName := question.ImageURL[len("/minio/qrquest-images/"):]
+			_ = h.minio.RemoveObject(c, "qrquest-images", objectName, minio.RemoveObjectOptions{})
+		}
+
+		objectName := "questions/" + uuid.New().String() + "-" + file.Filename
+		_, err = h.minio.PutObject(c, "qrquest-images", objectName, src, file.Size, minio.PutObjectOptions{
+			ContentType: file.Header.Get("Content-Type"),
+		})
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Ошибка загрузки изображения")
+			return
+		}
+		question.ImageURL = "/minio/qrquest-images/" + objectName
+	}
+
+	question.Text = input.Text
+	question.Answer = input.Answer
+	question.Note = input.Note
+	question.Points = input.Points
+
+	if err := h.db.Save(&question).Error; err != nil {
 		c.String(http.StatusInternalServerError, "Ошибка при обновлении вопроса: %v", err)
 		return
 	}
@@ -175,7 +234,18 @@ func (h *AdminHandler) HandleDeleteQuestion(c *gin.Context) {
 		return
 	}
 
-	if err := h.db.Delete(&models.Question{}, "id = ?", id).Error; err != nil {
+	var question models.Question
+	if err := h.db.First(&question, "id = ?", id).Error; err != nil {
+		c.String(http.StatusInternalServerError, "Не удалось получить вопрос")
+		return
+	}
+
+	if question.ImageURL != "" {
+		objectName := question.ImageURL[len("/minio/qrquest-images/"):]
+		_ = h.minio.RemoveObject(c, "qrquest-images", objectName, minio.RemoveObjectOptions{})
+	}
+
+	if err := h.db.Delete(&question).Error; err != nil {
 		c.String(http.StatusInternalServerError, "Ошибка при удалении вопроса")
 		return
 	}
